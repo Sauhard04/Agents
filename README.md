@@ -199,7 +199,6 @@ Contributions are welcome! If you'd like to add a new agent or improve an existi
 
 <div align="center">
 
-**Built with ❤️ using Microsoft Copilot Studio**
 
 Made by [Sauhard Kaushik](https://github.com/Sauhard04) · Meridian Solutions
 
