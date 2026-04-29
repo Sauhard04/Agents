@@ -1,0 +1,57 @@
+{
+  "version": "1.0.0",
+  "id": "16203ec3-eed2-451b-baaf-7b54216790e6",
+  "developer": {
+    "name": "Your developer name",
+    "websiteUrl": "https://go.microsoft.com/fwlink/?linkid=2352565",
+    "privacyUrl": "https://go.microsoft.com/fwlink/?linkid=2138865",
+    "termsOfUseUrl": "https://go.microsoft.com/fwlink/?linkid=2138950"
+  },
+  "name": {
+    "short": "License Recommendation Agent",
+    "full": "License Recommendation Agent"
+  },
+  "description": {
+    "short": "Built using Microsoft Copilot Studio",
+    "full": "Help employees stay informed, productive, and connected. Create copilots by describing its functionality and adding knowledge sources to it, and see it answer any question in a matter of minutes."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#07687d",
+  "bots": [
+    {
+      "botId": "16203ec3-eed2-451b-baaf-7b54216790e6",
+      "isNotificationOnly": false,
+      "supportsFiles": true,
+      "scopes": [
+        "personal",
+        "copilot"
+      ],
+      "registrationInfo": {
+        "source": "microsoftCopilotStudio",
+        "environment": "Default-a8801bcb-7990-408e-ab0c-e73eccd70288",
+        "schemaName": "cr195_LicenseRecommendationAgent",
+        "clusterCategory": "prod"
+      },
+      "supportsCalling": true
+    }
+  ],
+  "validDomains": [
+    "*.botframework.com",
+    "*.*.botframework.com",
+    "copilotstudio.microsoft.com",
+    "copilotstudio.preview.microsoft.com"
+  ],
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.24/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.24",
+  "copilotAgents": {
+    "customEngineAgents": [
+      {
+        "id": "16203ec3-eed2-451b-baaf-7b54216790e6",
+        "type": "bot"
+      }
+    ]
+  }
+}
