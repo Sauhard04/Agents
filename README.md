@@ -19,6 +19,9 @@
 - [Agents](#-agents)
   - [Claim Reimbursement Agent](#-claim-reimbursement-agent)
   - [M365 License Recommendation Agent](#-m365-license-recommendation-agent)
+  - [SOW Builder Agent](#-sow-builder-agent)
+  - [Mailbox Archive XML Generator](#-mailbox-archive-xml-generator)
+  - [FinOps Agent](#-finops-agent)
 - [Architecture](#-architecture)
 - [Getting Started](#-getting-started)
 - [Project Structure](#-project-structure)
@@ -88,6 +91,84 @@ A structured, flow-based advisor that walks users through a decision tree to rec
 - 🎯 Precise recommendations — maps requirements to the optimal M365 license tier
 - 🚫 No hallucination — strictly follows a predefined questionnaire (no generative guessing)
 - 💬 Rigid conversation flow — ensures consistent, reliable output every time
+
+---
+
+### 📄 SOW Builder Agent
+
+<table>
+<tr>
+<td width="120" align="center">
+
+**v1.0.0**
+
+</td>
+<td>
+
+An intelligent Scope of Work (SOW) document generator that collects migration project details via Adaptive Cards and produces a complete, professional SOW for GWS to M365 migration engagements.
+
+</td>
+</tr>
+</table>
+
+**✨ Key Features:**
+- 📋 Adaptive Card form — collects 9 fields in a single structured form (company, users, data sizes, environment)
+- 🧮 Auto-calculated timeline — derives migration phases (Pilot, Batch, Cutover) dynamically based on user count
+- 📊 Mailbox tier breakdown — auto-estimates mailbox distribution across size tiers
+- 📝 Full SOW generation — produces all 11 sections (Intro, Scope, Phases, Pre-reqs, Limitations, Out of Scope, Terms)
+- 🔁 Reusable — generate multiple SOWs in a single session
+- 🏗 Built on reference SOW — modeled after Meridian's Ethos Ltd GWS to M365 engagement
+
+---
+
+### 📧 Mailbox Archive XML Generator
+
+<table>
+<tr>
+<td width="120" align="center">
+
+**v1.0.0**
+
+</td>
+<td>
+
+A specialized tool for IT administrators that automates the generation of XML configuration files for mailbox archiving policies, ensuring consistent and error-free archive tiers.
+
+</td>
+</tr>
+</table>
+
+**✨ Key Features:**
+- 📧 Data collection — captures email addresses, creation dates, and current mailbox sizes
+- 📅 Tiered logic — automatically calculates archive tiers based on mailbox age and size
+- ⌨️ XML Generation — produces ready-to-use XML code blocks for mailbox configuration
+- ⏱️ Efficiency — reduces manual XML editing time and minimizes syntax errors
+
+---
+
+### 📊 FinOps Agent
+
+<table>
+<tr>
+<td width="120" align="center">
+
+**v1.0.0**
+
+</td>
+<td>
+
+An advanced AI advisor grounded in Microsoft Learn documentation that helps organizations optimize their Microsoft Cloud spending through FinOps principles.
+
+</td>
+</tr>
+</table>
+
+**✨ Key Features:**
+- ☁️ Multi-Cloud coverage — detailed guidance for Azure, M365, Copilot, Foundry (AI), and Fabric
+- 📖 Grounded in documentation — answers are anchored in official Microsoft Learn and pricing pages
+- 🌐 Web Browsing — access to real-time pricing updates and the latest cloud service announcements
+- 📈 Strategic advice — provides actionable recommendations for capacity planning, reservations, and right-sizing
+- ⚖️ Compliance focus — applies FinOps Foundation standards to enterprise cost management
 
 ---
 
@@ -166,6 +247,21 @@ Agents/
 │   ├── 📄 manifest.json          # Teams app manifest (v1.0.0)
 │   ├── 🖼️ color.png              # Full-color agent icon
 │   └── 🖼️ outline.png            # Outline agent icon
+│
+├── 📂 SOWBuilderAgent/
+│   ├── 📄 topic.yaml             # Copilot Studio topic YAML
+│   └── 📄 manifest.json          # Teams app manifest (v1.0.0)
+│
+├── 📂 Mailbox XML Generator/
+│   ├── 📄 manifest.json          # Teams app manifest (v1.0.0)
+│   ├── 🖼️ color.png              # Full-color agent icon
+│   └── 🖼️ outline.png            # Outline agent icon
+│
+├── 📂 finops/
+│   └── 📂 Finops Agent/          # Complete MCS Agent Project
+│       ├── 📄 agent.mcs.yml      # Agent role and instructions
+│       ├── 📂 knowledge/         # Grounding data and files
+│       └── 📂 topics/            # Custom conversational flows
 │
 └── 📄 README.md
 ```

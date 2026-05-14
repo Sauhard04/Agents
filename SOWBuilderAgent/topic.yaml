@@ -1,0 +1,190 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Generate SOW Document
+    triggerQueries:
+      - generate sow
+      - create scope of work
+      - build sow document
+      - new sow
+      - scope of work builder
+      - migration sow
+      - create migration proposal
+  actions:
+
+    - kind: SendMessage
+      id: welcomeMsg
+      message: '📄 **SOW Document Builder** — GWS to M365 Migration. I will collect your project details and generate a downloadable Word document.'
+
+    # ── ADAPTIVE CARD: Client & Environment Details ──
+    - kind: AdaptiveCardPrompt
+      id: askClientDetails
+      card: |-
+        {
+          "type": "AdaptiveCard",
+          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+          "version": "1.5",
+          "body": [
+            {
+              "type": "TextBlock",
+              "text": "📋 Client & Environment Details",
+              "weight": "Bolder",
+              "size": "Large",
+              "color": "Accent"
+            },
+            {
+              "type": "TextBlock",
+              "text": "Please fill in all fields below.",
+              "wrap": true,
+              "spacing": "Small"
+            },
+            {
+              "type": "Input.Text",
+              "id": "clientName",
+              "label": "Client Company Name",
+              "placeholder": "e.g. Ethos Ltd"
+            },
+            {
+              "type": "Input.Text",
+              "id": "sowDate",
+              "label": "SOW Date (YYYY/MM/DD)",
+              "placeholder": "e.g. 2026/04/30"
+            },
+            {
+              "type": "Input.Number",
+              "id": "totalUsers",
+              "label": "Total Number of Users",
+              "placeholder": "e.g. 852"
+            },
+            {
+              "type": "Input.ChoiceSet",
+              "id": "currentEnv",
+              "label": "Current Environment",
+              "style": "compact",
+              "choices": [
+                { "title": "Google Workspace", "value": "Google Workspace" },
+                { "title": "On-Premises Exchange", "value": "On-Premises Exchange" },
+                { "title": "Other Email Platform", "value": "Other Email Platform" }
+              ],
+              "placeholder": "Select current environment"
+            },
+            {
+              "type": "Input.Text",
+              "id": "totalMailboxSize",
+              "label": "Total Mailbox Size (in TB)",
+              "placeholder": "e.g. 11.3"
+            },
+            {
+              "type": "Input.Text",
+              "id": "totalDriveSize",
+              "label": "Total Drive/File Size (in TB)",
+              "placeholder": "e.g. 8.6"
+            },
+            {
+              "type": "Input.Number",
+              "id": "highestMailbox",
+              "label": "Highest Single Mailbox Size (in GB)",
+              "placeholder": "e.g. 196"
+            },
+            {
+              "type": "Input.Number",
+              "id": "highestDrive",
+              "label": "Highest Single Drive Size (in GB)",
+              "placeholder": "e.g. 866"
+            },
+            {
+              "type": "Input.ChoiceSet",
+              "id": "migrationScope",
+              "label": "Migration Scope",
+              "style": "compact",
+              "choices": [
+                { "title": "Mail Only", "value": "Mail Only" },
+                { "title": "Mail + Drive", "value": "Mail + Drive" },
+                { "title": "Mail + Drive + Calendar & Contacts", "value": "Mail + Drive + Calendar & Contacts" }
+              ],
+              "placeholder": "Select migration scope"
+            }
+          ],
+          "actions": [
+            {
+              "type": "Action.Submit",
+              "title": "Generate SOW ➡️",
+              "style": "positive"
+            }
+          ]
+        }
+      OutputType:
+        properties:
+          clientName:
+            displayName: clientName
+            type: String
+          sowDate:
+            displayName: sowDate
+            type: String
+          totalUsers:
+            displayName: totalUsers
+            type: String
+          currentEnv:
+            displayName: currentEnv
+            type: String
+          totalMailboxSize:
+            displayName: totalMailboxSize
+            type: String
+          totalDriveSize:
+            displayName: totalDriveSize
+            type: String
+          highestMailbox:
+            displayName: highestMailbox
+            type: String
+          highestDrive:
+            displayName: highestDrive
+            type: String
+          migrationScope:
+            displayName: migrationScope
+            type: String
+      output:
+        binding:
+          clientName: Topic.ClientName
+          sowDate: Topic.SOWDate
+          totalUsers: Topic.TotalUsers
+          currentEnv: Topic.CurrentEnv
+          totalMailboxSize: Topic.TotalMailboxSize
+          totalDriveSize: Topic.TotalDriveSize
+          highestMailbox: Topic.HighestMailbox
+          highestDrive: Topic.HighestDrive
+          migrationScope: Topic.MigrationScope
+
+    # ── Confirm what was captured ──
+    - kind: SendMessage
+      id: confirmMsg
+      message: =Concatenate("⏳ Got it! Generating SOW for **", Topic.ClientName, "** (", Topic.TotalUsers, " users). Please wait...")
+
+    # ── Call Power Automate flow to generate Word doc ──
+    - kind: InvokeFlowAction
+      id: generateSOWDoc
+      flowId: REPLACE_WITH_YOUR_FLOW_GUID
+      input:
+        binding:
+          text_ClientName: =Topic.ClientName
+          text_SOWDate: =Topic.SOWDate
+          text_TotalUsers: =Topic.TotalUsers
+          text_CurrentEnv: =Topic.CurrentEnv
+          text_TotalMailboxSize: =Topic.TotalMailboxSize
+          text_TotalDriveSize: =Topic.TotalDriveSize
+          text_HighestMailbox: =Topic.HighestMailbox
+          text_HighestDrive: =Topic.HighestDrive
+          text_MigrationScope: =Topic.MigrationScope
+      output:
+        binding:
+          text_DocumentURL: Topic.DocumentURL
+
+    # ── Send download link ──
+    - kind: SendMessage
+      id: sendLink
+      message: =Concatenate("✅ **Your SOW document is ready!**", Char(10), Char(10), "📥 [Click here to download the Word document](", Topic.DocumentURL, ")", Char(10), Char(10), "📋 **Summary:**", Char(10), "- Client: **", Topic.ClientName, "**", Char(10), "- Users: **", Topic.TotalUsers, "**", Char(10), "- Environment: **", Topic.CurrentEnv, "**", Char(10), "- Scope: **", Topic.MigrationScope, "**")
+
+    - kind: SendMessage
+      id: closeMsg
+      message: 'Need another SOW? Say **"generate sow"** again! 😊'

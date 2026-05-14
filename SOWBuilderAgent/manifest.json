@@ -1,0 +1,57 @@
+{
+  "version": "1.0.3",
+  "id": "sow-builder-agent-meridian",
+  "developer": {
+    "name": "Meridian Solutions Pvt. Ltd.",
+    "websiteUrl": "https://www.onmeridian.com",
+    "privacyUrl": "https://go.microsoft.com/fwlink/?linkid=2138865",
+    "termsOfUseUrl": "https://go.microsoft.com/fwlink/?linkid=2138950"
+  },
+  "name": {
+    "short": "SOW Builder Agent",
+    "full": "GWS to M365 Migration SOW Builder Agent"
+  },
+  "description": {
+    "short": "Generates SOW documents for GWS to M365 migrations",
+    "full": "Collects client details (company name, user count, data sizes, current environment) via Adaptive Cards and generates a complete Scope of Work document for Google Workspace to Microsoft 365 migration projects."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#0078d4",
+  "bots": [
+    {
+      "botId": "sow-builder-agent-meridian",
+      "isNotificationOnly": false,
+      "supportsFiles": false,
+      "scopes": [
+        "personal",
+        "copilot"
+      ],
+      "registrationInfo": {
+        "source": "microsoftCopilotStudio",
+        "environment": "Default-a8801bcb-7990-408e-ab0c-e73eccd70288",
+        "schemaName": "cr_SOWBuilderAgent",
+        "clusterCategory": "prod"
+      },
+      "supportsCalling": false
+    }
+  ],
+  "validDomains": [
+    "*.botframework.com",
+    "*.*.botframework.com",
+    "copilotstudio.microsoft.com",
+    "copilotstudio.preview.microsoft.com"
+  ],
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.24/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.24",
+  "copilotAgents": {
+    "customEngineAgents": [
+      {
+        "id": "sow-builder-agent-meridian",
+        "type": "bot"
+      }
+    ]
+  }
+}

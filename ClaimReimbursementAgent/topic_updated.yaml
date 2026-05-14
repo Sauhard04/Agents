@@ -1,0 +1,246 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Submit Claim Reimbursement
+    triggerQueries:
+      - submit claim
+      - claim reimbursement
+      - expense reimbursement
+      - reimbursement request
+      - submit expense
+
+  actions:
+    - kind: SendActivity
+      id: sendActivity_welcome
+      activity: Welcome! Please fill the claim reimbursement form below. ✅
+
+    - kind: AdaptiveCardPrompt
+      id: adaptiveCardPrompt_claimForm_sp_7c12a9
+      card: |
+        {
+          "type": "AdaptiveCard",
+          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+          "version": "1.5",
+          "body": [
+            { "type": "TextBlock", "text": "🧾 Claim Reimbursement", "weight": "Bolder", "size": "Large", "wrap": true },
+            { "type": "TextBlock", "text": "Fill all details and submit. You will be asked to upload proof image next.", "isSubtle": true, "wrap": true, "spacing": "None" },
+
+            {
+              "type": "Input.ChoiceSet",
+              "id": "claimType",
+              "label": "Type",
+              "style": "compact",
+              "isRequired": true,
+              "errorMessage": "Please select Type",
+              "choices": [
+                { "title": "Travel", "value": "Travel" },
+                { "title": "Meals", "value": "Meals" },
+                { "title": "Internet/Phone", "value": "Internet/Phone" },
+                { "title": "Office Supplies", "value": "Office Supplies" },
+                { "title": "Other", "value": "Other" }
+              ]
+            },
+            {
+              "type": "Input.Text",
+              "id": "employeeName",
+              "label": "Employee Name",
+              "placeholder": "Enter full name",
+              "isRequired": true,
+              "errorMessage": "Employee Name is required"
+            },
+            {
+              "type": "Input.Text",
+              "id": "employeeId",
+              "label": "Employee ID",
+              "placeholder": "Enter Employee ID",
+              "isRequired": true,
+              "errorMessage": "Employee ID is required",
+              "regex": "^[A-Za-z0-9\\-_/]{3,30}$"
+            },
+            {
+              "type": "Input.Date",
+              "id": "dateOfExpense",
+              "label": "Date of Expense",
+              "isRequired": true,
+              "errorMessage": "Date of Expense is required"
+            },
+            {
+              "type": "Input.Number",
+              "id": "claimAmountInr",
+              "label": "Claim Amount (INR)",
+              "placeholder": "0",
+              "min": 1,
+              "isRequired": true,
+              "errorMessage": "Enter amount greater than 0"
+            }
+          ],
+          "actions": [
+            { "type": "Action.Submit", "title": "Submit", "data": { "actionSubmitId": "claimSPForm_v1_submit" } }
+          ]
+        }
+      output:
+        binding:
+          claimAmountInr: Topic.ClaimAmountINR
+          claimType: Topic.ClaimType
+          dateOfExpense: Topic.DateOfExpenseRaw
+          employeeId: Topic.EmployeeID
+          employeeName: Topic.EmployeeName
+
+      outputType:
+        properties:
+          claimAmountInr: Number
+          claimType: String
+          dateOfExpense: String
+          employeeId: String
+          employeeName: String
+
+    # ── Ask user to upload proof image (uses File entity) ──
+    - kind: Question
+      id: question_proofImage
+      interruptionPolicy:
+        allowInterruption: false
+      variable: Topic.ProofImageFile
+      prompt: "📸 Please upload the proof of expense image (photo or screenshot):"
+      entity:
+        kind: FilePrebuiltEntity
+        includeFileMetadata: true
+
+
+    # ── Safe variable assignments ──
+    - kind: SetVariable
+      id: setSafeEmployeeName
+      variable: Topic.EmployeeNameSafe
+      value: =Text(Coalesce(Topic.EmployeeName, ""))
+
+    - kind: SetVariable
+      id: setSafeEmployeeId
+      variable: Topic.EmployeeIDSafe
+      value: =Text(Coalesce(Topic.EmployeeID, ""))
+
+    - kind: SetVariable
+      id: setSafeClaimType
+      variable: Topic.ClaimTypeSafe
+      value: =Text(Coalesce(Topic.ClaimType, ""))
+
+    - kind: SetVariable
+      id: setSafeAmount
+      variable: Topic.ClaimAmountINRSafe
+      value: =Coalesce(Topic.ClaimAmountINR, 0)
+
+    - kind: SetVariable
+      id: setSafeExpenseRaw
+      variable: Topic.DateOfExpenseRawSafe
+      value: =Text(Coalesce(Topic.DateOfExpenseRaw, Text(Today(), "yyyy-MM-dd")))
+
+    - kind: SetVariable
+      id: setDateExpense
+      variable: Topic.DateOfExpense
+      value: =DateValue(Topic.DateOfExpenseRawSafe)
+
+    - kind: SetVariable
+      id: setDateExpenseISO
+      variable: Topic.DateOfExpenseISO
+      value: =Text(Topic.DateOfExpense, "yyyy-MM-dd")
+
+    - kind: SetVariable
+      id: setDateClaim
+      variable: Topic.DateOfClaim
+      value: =Today()
+
+    - kind: SetVariable
+      id: setDateClaimISO
+      variable: Topic.DateOfClaimISO
+      value: =Text(Topic.DateOfClaim, "yyyy-MM-dd")
+
+    - kind: SetVariable
+      id: setDateExpenseUTC
+      variable: Topic.DateOfExpenseUTC
+      value: =Text(DateAdd(Topic.DateOfExpense, -TimeZoneOffset(Topic.DateOfExpense), TimeUnit.Minutes), DateTimeFormat.UTC)
+
+    - kind: SetVariable
+      id: setDateClaimUTC
+      variable: Topic.DateOfClaimUTC
+      value: =Text(DateAdd(Topic.DateOfClaim, -TimeZoneOffset(Topic.DateOfClaim), TimeUnit.Minutes), DateTimeFormat.UTC)
+
+    # ── Flow 1: SharePoint Feeder (image passed as File input) ──
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_vGVvI8
+      input:
+        binding:
+          number: =Topic.ClaimAmountINR
+          text: =Topic.EmployeeName
+          text_1: =Topic.EmployeeID
+          text_2: =Topic.ClaimType
+          text_3: =Topic.DateOfExpenseISO
+          text_4: =Topic.DateOfClaimUTC
+          file: =Topic.ProofImageFile
+
+      output: {}
+      flowId: 6c7f108c-fb98-d640-fd26-8a707e7f927d
+
+    - kind: SendActivity
+      id: sendActivity_summary
+      activity: |
+        ✅ Details captured:
+        - Type: {Topic.ClaimType}
+        - Employee Name: {Topic.EmployeeName}
+        - Employee ID: {Topic.EmployeeID}
+        - Date of Expense: {Topic.DateOfExpenseISO}
+        - Date of Claim: {Topic.DateOfClaimISO}
+        - Amount (INR): {Text(Topic.ClaimAmountINR)}
+        - Proof Image: Attached ✅
+
+    - kind: ConditionGroup
+      id: conditionGroup_KpmJME
+      conditions:
+        - id: conditionItem_RFTuFl
+          condition: =Topic.ClaimAmountINR > 2000
+          displayName: Condition
+          actions:
+            - kind: Question
+              id: question_f0Sp90
+              interruptionPolicy:
+                allowInterruption: true
+
+              variable: Topic.ManagerEmail
+              prompt: Please provide your Manager Email
+              entity:
+                kind: EmailPrebuiltEntity
+                sensitivityLevel: None
+
+            - kind: InvokeFlowAction
+              id: invokeFlowAction_HPd8EQ
+              input:
+                binding:
+                  email: =Topic.ManagerEmail
+                  number: =Topic.ClaimAmountINR
+                  text: =Topic.EmployeeName
+                  text_1: =Topic.EmployeeID
+                  text_3: =Topic.ClaimType
+                  file: =Topic.ProofImageFile
+
+              output: {}
+              flowId: 94087af1-e3b3-fc0d-34ca-1d38aa796233
+
+            - kind: SendActivity
+              id: sendActivity_KepWxI
+              activity: Approval to the manager has been sent.
+
+    # ── Flow 3: HR Verification Email (image passed as File input) ──
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_xiSFSV
+      input:
+        binding:
+          number: =Topic.ClaimAmountINRSafe
+          text: =Topic.EmployeeNameSafe
+          text_1: =Topic.ClaimTypeSafe
+          file: =Topic.ProofImageFile
+
+      output: {}
+      flowId: 388d16c2-0f34-f111-88b4-70a8a569111a
+
+    - kind: SendActivity
+      id: sendActivity_done
+      activity: 🎉 Your claim has been saved and a verification mail has been sent to the HR.
